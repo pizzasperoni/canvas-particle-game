@@ -5,11 +5,16 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
 </head>
 <body>
-
-
-  <div class="fixed text-white text-sm ml-2 mt-1 select-none"><span>Score: </span><span id="scoreEl">0</span></div>
+  <div class="fixed text-white text-sm ml-2 mt-1 select-none">
+    <span>Score: </span><span id="scoreEl">0</span>
+  </div>
+  
+  <a class="fixed text-white text-sm ml-2 mt-8" href="https://github.com/pizzasperoni/canvas-particle-game" target="_blank">
+    <i class="fa fa-github fa_custom" aria-hidden="true"></i>
+  </a>
 
   <div class="fixed inset-0 flex items-center justify-center" id="modalEl">
     <div class="bg-white max-w-md w-full p-6 text-center">
@@ -26,6 +31,9 @@
     body {
       margin: 0;
       background-color: black;
+    }
+    .fa_custom {
+      font-size: 30px;
     }
   </style>
 </body>
