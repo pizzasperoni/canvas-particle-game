@@ -1,3 +1,8 @@
+import { Player } from './Player.js'
+import { Projectile } from './Projectile.js'
+import { Enemy } from './Enemy.js'
+import { Particle } from './Particle.js'
+
 const canvas = document.querySelector('canvas')
 const context = canvas.getContext('2d')
 
@@ -8,92 +13,6 @@ const scoreEl = document.getElementById("scoreEl")
 const startGameBtn = document.getElementById("startGameBtn")
 const modalEl = document.getElementById("modalEl")
 const bigScore = document.getElementById("bigScore")
-
-class Player {
-  constructor(x, y , radius, color) {
-    this.x = x
-    this.y = y
-    this.radius = radius
-    this.color = color
-  }
-  draw() {
-    context.beginPath()
-    context.arc(this.x, this.y, this.radius, 0 , Math.PI * 2, false)
-    context.fillStyle = this.color
-    context.fill()
-  }
-}
-
-class Projectile {
-  constructor(x, y, radius, color, velocity) {
-    this.x = x
-    this.y = y
-    this.radius = radius
-    this.color = color
-    this.velocity = velocity
-  }
-  draw() {
-    context.beginPath()
-    context.arc(this.x, this.y, this.radius, 0 , Math.PI * 2, false)
-    context.fillStyle = this.color
-    context.fill()
-  }
-  update() {
-    this.draw()
-    this.x = this.x + this.velocity.x
-    this.y = this.y + this.velocity.y
-  }
-}
-
-class Enemy {
-  constructor(x, y, radius, color, velocity) {
-    this.x = x
-    this.y = y
-    this.radius = radius
-    this.color = color
-    this.velocity = velocity
-  }
-  draw() {
-    context.beginPath()
-    context.arc(this.x, this.y, this.radius, 0 , Math.PI * 2, false)
-    context.fillStyle = this.color
-    context.fill()
-  }
-  update() {
-    this.draw()
-    this.x = this.x + this.velocity.x
-    this.y = this.y + this.velocity.y
-  }
-}
-
-const friction = 0.99
-class Particle {
-  constructor(x, y, radius, color, velocity) {
-    this.x = x
-    this.y = y
-    this.radius = radius
-    this.color = color
-    this.velocity = velocity
-    this.alpha = 1
-  }
-  draw() {
-    context.save()
-    context.globalAlpha = 0.1
-    context.beginPath()
-    context.arc(this.x, this.y, this.radius, 0 , Math.PI * 2, false)
-    context.fillStyle = this.color
-    context.fill()
-    context.restore()
-  }
-  update() {
-    this.draw()
-    this.velocity.x *= friction
-    this.velocity.y *= friction
-    this.x = this.x + this.velocity.x
-    this.y = this.y + this.velocity.y
-    this.alpha -= 0.01
-  }
-}
 
 const x = canvas.width / 2
 const y = canvas.height / 2
@@ -144,25 +63,25 @@ function animate() {
   animationId = requestAnimationFrame(animate)
   context.fillStyle = 'rgba(0, 0 ,0 , 0.1)'
   context.fillRect(0, 0, canvas.width, canvas.height)
-  player.draw()
+  player.draw(context)
   particles.forEach((particle, index) => {
     if (particle.alpha <= 0){
       particles.splice(index, 1)
     }else {
-      particle.update()
+      particle.update(context)
     }
   })
   projectiles.forEach((projectile, index) => {
-    projectile.update()
+    projectile.update(context)
     // remove from edges of screen
-    if(projectile.x + projectile.radius < 0 || projectile.x - projectile.radius > canvas.width || projectiles.y + projectile.radius < 0 || projectile.y - projectile.radius > canvas.height) {
+    if(projectile.x + projectile.radius < 0 || projectile.x - projectile.radius > canvas.width || projectile.y + projectile.radius < 0 || projectile.y - projectile.radius > canvas.height) {
       setTimeout(()=>{
         projectiles.splice(index, 1)
       }, 0)
     }
   })
   enemies.forEach((enemy, index) => {
-    enemy.update()
+    enemy.update(context)
     const dist = Math.hypot(player.x - enemy.x, player.y - enemy.y)
     // end game
     if (dist - enemy.radius - player.radius < 1) {
@@ -178,24 +97,23 @@ function animate() {
         for(let i = 0; i < enemy.radius * 2; i++){
           particles.push(new Particle(projectile.x, projectile.y, Math.random() * 2, enemy.color, {x: Math.random() - 0.5 * Math.random() * 6, y: Math.random() - 0.5 * Math.random() * 6}))
         }
-          if (enemy.radius - 10 > 5){
-            // increase score
-            score += 100
-            scoreEl.innerHTML = score
-            gsap.to(enemy, {
-              radius: enemy.radius - 10
-            })
-            setTimeout(()=> {
-              projectiles.splice(projectileIndex, 1)
-            }, 0)
-            
-          }else {
-            setTimeout(()=> {
-              enemies.splice(index, 1)
-              projectiles.splice(projectileIndex, 1)
-            }, 0)
-          }
-
+        if (enemy.radius - 10 > 5){
+          // increase score
+          score += 100
+          scoreEl.innerHTML = score
+          gsap.to(enemy, {
+            radius: enemy.radius - 10
+          })
+          setTimeout(()=> {
+            projectiles.splice(projectileIndex, 1)
+          }, 0)
+          
+        }else {
+          setTimeout(()=> {
+            enemies.splice(index, 1)
+            projectiles.splice(projectileIndex, 1)
+          }, 0)
+        }
       }
     })
   })
@@ -207,7 +125,7 @@ window.addEventListener('click', e =>{
     x: Math.cos(angle) * 5,
     y: Math.sin(angle) * 5
   }
-  projectiles.push(new Projectile(canvas.width / 2, canvas.height / 2, 5, 'blue', velocity))
+  projectiles.push(new Projectile(canvas.width / 2, canvas.height / 2, 5, 'white', velocity))
 })
 
 startGameBtn.addEventListener('click', () => {
